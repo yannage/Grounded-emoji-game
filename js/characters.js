@@ -6,7 +6,7 @@ function animatePlayerMovement(startX, startY, endX, endY) {
     // Create a temporary element for animation
     const playerElement = document.createElement("div");
     playerElement.textContent = "👦";
-    playerElement.className = "cell player-moving";
+    playerElement.className = "player-moving";
     document.body.appendChild(playerElement);
     
     // Position at start
@@ -16,13 +16,12 @@ function animatePlayerMovement(startX, startY, endX, endY) {
     const endRect = endCell.getBoundingClientRect();
     
     playerElement.style.position = "fixed";
-    playerElement.style.left = `${startRect.left}px`;
-    playerElement.style.top = `${startRect.top}px`;
-    playerElement.style.width = `${startRect.width}px`;
-    playerElement.style.height = `${startRect.height}px`;
-    playerElement.style.display = "flex";
-    playerElement.style.justifyContent = "center";
-    playerElement.style.alignItems = "center";
+    playerElement.style.left = `${startRect.left + startRect.width/2}px`;
+    playerElement.style.top = `${startRect.top + startRect.height/2}px`;
+    playerElement.style.transform = "translate(-50%, -50%)";
+    playerElement.style.fontSize = "20px";
+    playerElement.style.zIndex = "100";
+    playerElement.style.background = "none";
     
     // Animate
     const animationDuration = 500; // 500ms
@@ -32,8 +31,8 @@ function animatePlayerMovement(startX, startY, endX, endY) {
         const elapsedTime = currentTime - startTime;
         const progress = Math.min(elapsedTime / animationDuration, 1);
         
-        const currentX = startRect.left + (endRect.left - startRect.left) * progress;
-        const currentY = startRect.top + (endRect.top - startRect.top) * progress;
+        const currentX = startRect.left + (endRect.left - startRect.left) * progress + startRect.width/2;
+        const currentY = startRect.top + (endRect.top - startRect.top) * progress + startRect.height/2;
         
         playerElement.style.left = `${currentX}px`;
         playerElement.style.top = `${currentY}px`;
