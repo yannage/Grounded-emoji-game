@@ -6,23 +6,139 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Grounded! - The Sneaky TV Watching Game</title>
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f0f0f0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-        }
         
-        #game-container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            width: 100%;
-            max-width: 800px;
-        }
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f0f0f0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    margin: 0;
+}
+
+#game-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    max-width: 800px;
+}
+
+#house-grid {
+    display: grid;
+    grid-template-columns: repeat(15, minmax(20px, 1fr));
+    grid-template-rows: repeat(12, minmax(20px, 1fr));
+    gap: 1px;
+    background-color: #333;
+    padding: 5px;
+    border-radius: 5px;
+    width: 100%;
+    aspect-ratio: 15/12;
+    box-sizing: border-box;
+}
+
+.cell {
+    width: 100%;
+    height: 100%;
+    min-height: 30px;
+    background-color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    user-select: none;
+    position: relative;
+}
+
+@media screen and (max-width: 600px) {
+    .cell {
+        font-size: 16px;
+        min-height: 25px;
+    }
+    
+    #house-grid {
+        grid-template-columns: repeat(15, 1fr);
+        grid-template-rows: repeat(12, 1fr);
+    }
+}
+`;
+
+// Add this code at the beginning of your script section
+function fixGrid() {
+    // Add the fixed CSS
+    const styleElement = document.createElement('style');
+    styleElement.textContent = fixedCss;
+    document.head.appendChild(styleElement);
+    
+    // Force re-render of the grid
+    renderGrid();
+    
+    // Ensure cells have proper dimensions
+    const cells = document.querySelectorAll('.cell');
+    cells.forEach(cell => {
+        cell.style.height = cell.offsetWidth + 'px';
+    });
+}
+
+// Initialize game - modify this function
+function initGame() {
+    // Set up event listeners
+    document.getElementById("hide-button").addEventListener("click", toggleHiding);
+    document.getElementById("lock-door-button").addEventListener("click", toggleDoorLock);
+    document.getElementById("end-turn-button").addEventListener("click", endTurn);
+    document.getElementById("restart-button").addEventListener("click", () => {
+        document.getElementById("game-over-modal").style.display = "none";
         
+        // Reset for new grounding
+        gameState.score = 0;
+        gameState.day = 1;
+        gameState.time = 8 * 60; // 8:00 AM
+        gameState.playerPosition = { x: 2, y: 2 };
+        gameState.playerHiding = false;
+        gameState.dadPosition = { x: 7, y: 2 };
+        gameState.momPosition = { x: 8, y: 2 };
+        gameState.dadTarget = null;
+        gameState.momTarget = null;
+        gameState.suspicion = 0;
+        gameState.currentShow = null;
+        gameState.upcomingShows = [];
+        gameState.watchingTV = false;
+        gameState.movesLeft = gameState.upgrades.quietShoes.owned ? 4 : 3;
+        gameState.lockedDoors = [];
+        gameState.showsWatched = 0;
+        
+        // Generate shows for the new game
+        generateShows();
+        
+        updateUI();
+        renderGrid();
+    });
+    
+    // Generate initial shows
+    generateShows();
+    
+    // Fix and render the grid
+    fixGrid();
+    
+    // Add window resize listener
+    window.addEventListener('resize', fixGrid);
+    
+    // Update UI
+    updateUI();
+}
+```
+
+The problem is that the grid isn't properly sizing on mobile devices. This fix does several things:
+
+1. Uses responsive CSS with fluid grid columns and rows
+2. Ensures the grid maintains its proper aspect ratio
+3. Adjusts font sizes for mobile screens
+4. Adds a resize handler to ensure the grid stays properly sized
+
+You can either add this code to your existing file, or if you'd prefer, I can create a completely new version of the game with these fixes incorporated. The specific issue appears to be that the cells aren't being displayed at all, likely because their dimensions are collapsing to zero or the grid is overflowing its container.
+
+
         #house-grid {
             display: grid;
             grid-template-columns: repeat(15, 40px);
