@@ -1,53 +1,106 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grounded! - The Sneaky TV Watching Game</title>
+    <title>You're Grounded! - The Sneaky TV Watching Game</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <meta name="description" content="A fun game about sneaking around to watch TV while you're grounded!">
 </head>
 <body>
-    <h1>Grounded! 📺</h1>
-    <div id="game-container">
-        <div class="info-panel">
-            <div>
-                <div>Time: <span id="game-time">8:00 AM</span></div>
-                <div>Day: <span id="day-counter">1</span> of <span id="grounded-days">3</span></div>
-                <div>Moves Left: <span id="moves-counter">3</span></div>
+    <div class="game-wrapper">
+        <header>
+            <h1>You're Grounded! <span class="tv-emoji">📺</span></h1>
+            <p class="tagline">Don't get caught watching TV!</p>
+        </header>
+
+        <div id="game-container">
+            <div class="info-panel">
+                <div class="info-section">
+                    <div class="info-item"><span class="info-label">Time:</span> <span id="game-time">8:00 AM</span></div>
+                    <div class="info-item"><span class="info-label">Day:</span> <span id="day-counter">1</span> of <span id="grounded-days">3</span></div>
+                    <div class="info-item"><span class="info-label">Moves Left:</span> <span id="moves-counter">3</span></div>
+                </div>
+                <div class="info-section">
+                    <div class="info-item"><span class="info-label">Score:</span> <span id="score-display">0</span></div>
+                    <div class="info-item"><span class="info-label">Total Points:</span> <span id="total-points-display">0</span></div>
+                    <div class="info-item"><span class="info-label">Next Show:</span> <span id="next-show-time">9:00 AM</span> (<span id="next-show-length">30</span> min)</div>
+                </div>
             </div>
-            <div>
-                <div>Score: <span id="score-display">0</span></div>
-                <div>Total Points: <span id="total-points-display">0</span></div>
-                <div>Next Show: <span id="next-show-time">9:00 AM</span> (<span id="next-show-length">30</span> min)</div>
+            
+            <div id="house-grid"></div>
+            
+            <div class="controls">
+                <button id="hide-button" disabled>Hide 🫥</button>
+                <button id="lock-door-button" disabled>Lock Door 🔒</button>
+                <button id="tv-button" disabled>TV 📺</button>
+                <button id="end-turn-button">End Turn ⏭️</button>
             </div>
         </div>
         
-        <div id="house-grid"></div>
-
-<div class="controls">
-    <button id="hide-button" disabled>Hide 🫥</button>
-    <button id="lock-door-button" disabled>Lock Door 🔒</button>
-    <button id="tv-button" disabled>TV 📺</button>
-    <button id="end-turn-button">End Turn ⏭️</button>
-</div>
+        <div class="notification" id="notification"></div>
         
-    <div class="notification" id="notification"></div>
-    
-    <div id="game-over-modal">
+        <div id="game-over-modal">
+            <div class="modal-content">
+                <h2 id="game-over-title">Game Over!</h2>
+                <p id="game-over-message">You were caught watching TV!</p>
+                <div class="stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Final Score:</span>
+                        <span id="final-score" class="stat-value">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Shows Watched:</span>
+                        <span id="shows-watched" class="stat-value">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Total Points Earned:</span>
+                        <span id="points-earned" class="stat-value">0</span>
+                    </div>
+                </div>
+                <h3>Spend your points on upgrades:</h3>
+                <div id="upgrade-panel">
+                    <!-- Upgrades will be added here -->
+                </div>
+                <button id="restart-button">Start Next Grounding</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 You're Grounded! | <button id="help-button" class="text-button">How to Play</button></p>
+    </footer>
+
+    <div id="help-modal" class="modal">
         <div class="modal-content">
-            <h2 id="game-over-title">Game Over!</h2>
-            <p id="game-over-message">You were caught watching TV!</p>
-            <div class="stats">
-                <p>Final Score: <span id="final-score">0</span></p>
-                <p>Shows Watched: <span id="shows-watched">0</span></p>
-                <p>Total Points Earned: <span id="points-earned">0</span></p>
+            <span class="close-button">&times;</span>
+            <h2>How to Play</h2>
+            <div class="help-content">
+                <h3>Goal</h3>
+                <p>Watch as many TV shows as possible without getting caught by your parents!</p>
+                
+                <h3>Controls</h3>
+                <ul>
+                    <li>Click on a floor tile to move</li>
+                    <li>Click the TV button when next to a TV to watch</li>
+                    <li>Click the Hide button when next to a trash bin to hide</li>
+                    <li>Click the Lock Door button when next to a door to lock it</li>
+                    <li>Click End Turn to advance time by 30 minutes</li>
+                </ul>
+                
+                <h3>Tips</h3>
+                <ul>
+                    <li>The TV must be on during a show's scheduled time to earn points</li>
+                    <li>Parents get suspicious when they hear the TV</li>
+                    <li>Lock doors to keep parents out of rooms</li>
+                    <li>Hide in trash bins when parents are approaching</li>
+                    <li>Spend points on upgrades for better abilities!</li>
+                </ul>
             </div>
-            <h3>Spend your points on upgrades:</h3>
-            <div id="upgrade-panel">
-                <!-- Upgrades will be added here -->
-            </div>
-            <button id="restart-button">Start Next Grounding</button>
         </div>
     </div>
 
