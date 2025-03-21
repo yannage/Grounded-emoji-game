@@ -30,40 +30,76 @@ function renderGrid() {
                 cell.textContent = cellData.content;
             }
             
-            // Add TV status
-  
-if (gameState.tvLocations.some(tv => tv.x === x && tv.y === y)) {
-    const tvStatus = document.createElement("div");
-    tvStatus.className = "tv-status";
-    
-    if (gameState.watchingTV && gameState.playerPosition.x === x && gameState.playerPosition.y === y) {
-        tvStatus.textContent = "ON";
-        tvStatus.classList.add("on");
-        cell.style.color = "red";  // TV is on
-    } else {
-        tvStatus.textContent = "OFF";
-    }
-    
-    cell.appendChild(tvStatus);
-}
+            // Handle TV locations and player rendering
+            if (gameState.tvLocations.some(tv => tv.x === x && tv.y === y)) {
+                // Create a container for layering TV and player
+                const contentContainer = document.createElement("div");
+                contentContainer.style.position = "relative";
+                contentContainer.style.width = "100%";
+                contentContainer.style.height = "100%";
+                contentContainer.style.display = "flex";
+                contentContainer.style.justifyContent = "center";
+                contentContainer.style.alignItems = "center";
+                cell.appendChild(contentContainer);
+                
+                // Add TV character
+                const tvElement = document.createElement("div");
+                tvElement.style.position = "absolute";
+                tvElement.style.zIndex = gameState.watchingTV ? "5" : "1"; // TV on top when on
+                tvElement.textContent = "📺";
+                
+                // Add glow effect if TV is on
+                if (gameState.watchingTV && gameState.playerPosition.x === x && gameState.playerPosition.y === y) {
+                    tvElement.classList.add("tv-on");
+                }
+                
+                contentContainer.appendChild(tvElement);
+                
+                // Add player if on same cell
+                if (gameState.playerPosition.x === x && gameState.playerPosition.y === y) {
+                    const playerElement = document.createElement("div");
+                    playerElement.style.position = "absolute";
+                    playerElement.style.zIndex = gameState.watchingTV ? "4" : "6"; // Player behind when watching
+                    
+                    if (gameState.playerHiding) {
+                        playerElement.textContent = "🫥";
+                    } else {
+                        playerElement.textContent = "👦";
+                        // Add transparency if watching TV
+                        if (gameState.watchingTV) {
+                            playerElement.style.opacity = "0.5";
+                        }
+                    }
+                    
+                    contentContainer.appendChild(playerElement);
+                }
+                
+                // Add TV status
+                const tvStatus = document.createElement("div");
+                tvStatus.className = "tv-status";
+                
+                if (gameState.watchingTV && gameState.playerPosition.x === x && gameState.playerPosition.y === y) {
+                    tvStatus.textContent = "ON";
+                    tvStatus.classList.add("on");
+                } else {
+                    tvStatus.textContent = "OFF";
+                }
+                
+                cell.appendChild(tvStatus);
+            } 
+            // Continue with the other character rendering for non-TV cells
+            else if (gameState.playerPosition.x === x && gameState.playerPosition.y === y) {
+                if (gameState.playerHiding) {
+                    cell.textContent = "🫥";
+                } else {
+                    cell.textContent = "👦";
+                }
+            } else if (gameState.dadPosition.x === x && gameState.dadPosition.y === y) {
+                cell.textContent = "👨";
+            } else if (gameState.momPosition.x === x && gameState.momPosition.y === y) {
+                cell.textContent = "👩";
+            }
             
-            // Add characters
-            
-if (gameState.playerPosition.x === x && gameState.playerPosition.y === y) {
-    if (gameState.playerHiding) {
-        cell.textContent = "🫥";
-    } else {
-        cell.textContent = "👦";
-        // Add transparency if watching TV
-        if (gameState.watchingTV && gameState.tvLocations.some(tv => tv.x === x && tv.y === y)) {
-            cell.classList.add("watching-tv");
-        }
-    }
-} else if (gameState.dadPosition.x === x && gameState.dadPosition.y === y) {
-    cell.textContent = "👨";
-} else if (gameState.momPosition.x === x && gameState.momPosition.y === y) {
-    cell.textContent = "👩";
-}
             // Highlight reachable cells
             if (gameState.movesLeft > 0 && !gameState.playerHiding) {
                 const distance = Math.abs(gameState.playerPosition.x - x) + Math.abs(gameState.playerPosition.y - y);
@@ -128,7 +164,6 @@ function updateUI() {
         document.getElementById("next-show-length").textContent = "0";
     }
     
-    
     // Update action buttons
     document.getElementById("hide-button").disabled = !gameState.trashBins.some(bin => 
         Math.abs(gameState.playerPosition.x - bin.x) + 
@@ -137,13 +172,11 @@ function updateUI() {
     document.getElementById("lock-door-button").disabled = !gameState.doorLocations.some(door => 
         Math.abs(gameState.playerPosition.x - door.x) + 
         Math.abs(gameState.playerPosition.y - door.y) <= 1);
-    
+        
     // Add this for the TV button
     document.getElementById("tv-button").disabled = !gameState.tvLocations.some(tv => 
         tv.x === gameState.playerPosition.x && tv.y === gameState.playerPosition.y);
 }
-
-
 
 // Show notification
 function showNotification(message) {
