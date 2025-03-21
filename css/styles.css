@@ -1,1 +1,219 @@
-new
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f0f0f0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    margin: 0;
+}
+
+#game-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    max-width: 800px;
+}
+
+#house-grid {
+    display: grid;
+    grid-template-columns: repeat(15, minmax(20px, 1fr));
+    grid-template-rows: repeat(12, minmax(20px, 1fr));
+    gap: 1px;
+    background-color: #333;
+    padding: 5px;
+    border-radius: 5px;
+    width: 100%;
+    aspect-ratio: 15/12;
+    box-sizing: border-box;
+}
+
+.cell {
+    width: 100%;
+    height: 100%;
+    min-height: 30px;
+    background-color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    user-select: none;
+    position: relative;
+}
+
+.wall {
+    background-color: #666;
+}
+
+.floor {
+    background-color: #f8f8f8;
+    cursor: pointer;
+}
+
+.floor.bedroom {
+    background-color: #ffd7d7;
+}
+
+.floor.living-room {
+    background-color: #d7d7ff;
+}
+
+.floor.kitchen {
+    background-color: #d7ffd7;
+}
+
+.floor.office {
+    background-color: #ffffd7;
+}
+
+.floor.bathroom {
+    background-color: #d7ffff;
+}
+
+.floor.attic {
+    background-color: #eaeaea;
+}
+
+.floor.basement {
+    background-color: #c0c0c0;
+}
+
+.floor.reachable {
+    border: 2px dashed #00ff00;
+}
+
+.door {
+    background-color: #a05a2c;
+    cursor: pointer;
+}
+
+.door.locked {
+    background-color: #8b4513;
+}
+
+.info-panel {
+    background-color: #333;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.controls {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+button {
+    padding: 5px 10px;
+    cursor: pointer;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.tv-status {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    font-size: 10px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 2px;
+    border-radius: 2px;
+}
+
+.notification {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    z-index: 100;
+    display: none;
+}
+
+#game-over-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    max-width: 400px;
+}
+
+#upgrade-panel {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.upgrade-item {
+    background-color: #f0f0f0;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.upgrade-item:hover {
+    background-color: #e0e0e0;
+}
+
+.upgrade-item.owned {
+    background-color: #d7ffd7;
+}
+
+.stats {
+    margin-top: 10px;
+    text-align: left;
+}
+
+@media screen and (max-width: 600px) {
+    .cell {
+        font-size: 16px;
+        min-height: 25px;
+    }
+    
+    #house-grid {
+        grid-template-columns: repeat(15, 1fr);
+        grid-template-rows: repeat(12, 1fr);
+    }
+    
+    .info-panel {
+        flex-direction: column;
+    }
+    
+    #upgrade-panel {
+        grid-template-columns: 1fr;
+    }
+}
