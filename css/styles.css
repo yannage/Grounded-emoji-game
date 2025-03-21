@@ -30,11 +30,11 @@ body {
 }
 
 @keyframes waddle {
-  0% { transform: rotate(-5deg) translateY(0); }
-  25% { transform: rotate(0deg) translateY(-2px); }
-  50% { transform: rotate(5deg) translateY(0); }
-  75% { transform: rotate(0deg) translateY(-2px); }
-  100% { transform: rotate(-5deg) translateY(0); }
+  0% { transform: translate(-50%, -50%) rotate(-5deg) translateY(0); }
+  25% { transform: translate(-50%, -50%) rotate(0deg) translateY(-2px); }
+  50% { transform: translate(-50%, -50%) rotate(5deg) translateY(0); }
+  75% { transform: translate(-50%, -50%) rotate(0deg) translateY(-2px); }
+  100% { transform: translate(-50%, -50%) rotate(-5deg) translateY(0); }
 }
 
 @keyframes move {
@@ -45,7 +45,9 @@ body {
 
 .player-moving {
   animation: waddle 0.5s ease-in-out, move 0.5s ease-in-out;
-  z-index: 10;
+  z-index: 100;
+  background: none;
+  pointer-events: none;
 }
 
 .cell {
