@@ -48,18 +48,22 @@ if (gameState.tvLocations.some(tv => tv.x === x && tv.y === y)) {
 }
             
             // Add characters
-            if (gameState.playerPosition.x === x && gameState.playerPosition.y === y) {
-                if (gameState.playerHiding) {
-                    cell.textContent = "🫥";
-                } else {
-                    cell.textContent = "👦";
-                }
-            } else if (gameState.dadPosition.x === x && gameState.dadPosition.y === y) {
-                cell.textContent = "👨";
-            } else if (gameState.momPosition.x === x && gameState.momPosition.y === y) {
-                cell.textContent = "👩";
-            }
             
+if (gameState.playerPosition.x === x && gameState.playerPosition.y === y) {
+    if (gameState.playerHiding) {
+        cell.textContent = "🫥";
+    } else {
+        cell.textContent = "👦";
+        // Add transparency if watching TV
+        if (gameState.watchingTV && gameState.tvLocations.some(tv => tv.x === x && tv.y === y)) {
+            cell.classList.add("watching-tv");
+        }
+    }
+} else if (gameState.dadPosition.x === x && gameState.dadPosition.y === y) {
+    cell.textContent = "👨";
+} else if (gameState.momPosition.x === x && gameState.momPosition.y === y) {
+    cell.textContent = "👩";
+}
             // Highlight reachable cells
             if (gameState.movesLeft > 0 && !gameState.playerHiding) {
                 const distance = Math.abs(gameState.playerPosition.x - x) + Math.abs(gameState.playerPosition.y - y);
