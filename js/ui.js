@@ -122,6 +122,7 @@ function updateUI() {
         document.getElementById("next-show-length").textContent = "0";
     }
     
+    
     // Update action buttons
     document.getElementById("hide-button").disabled = !gameState.trashBins.some(bin => 
         Math.abs(gameState.playerPosition.x - bin.x) + 
@@ -130,7 +131,13 @@ function updateUI() {
     document.getElementById("lock-door-button").disabled = !gameState.doorLocations.some(door => 
         Math.abs(gameState.playerPosition.x - door.x) + 
         Math.abs(gameState.playerPosition.y - door.y) <= 1);
+    
+    // Add this for the TV button
+    document.getElementById("tv-button").disabled = !gameState.tvLocations.some(tv => 
+        tv.x === gameState.playerPosition.x && tv.y === gameState.playerPosition.y);
 }
+
+
 
 // Show notification
 function showNotification(message) {
