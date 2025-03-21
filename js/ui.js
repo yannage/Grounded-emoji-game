@@ -217,3 +217,28 @@ function fixGridSizing() {
 window.addEventListener('resize', () => {
     fixGridSizing();
 });
+
+// Fix grid sizing issues
+function fixGridSizing() {
+    // For mobile, we'll use a different approach
+    if (window.innerWidth < 600) {
+        const gridElement = document.getElementById("house-grid");
+        const gridWidth = gridElement.offsetWidth;
+        const cellSize = gridWidth / 15; // 15 columns
+        
+        const cells = document.querySelectorAll('.cell');
+        cells.forEach(cell => {
+            cell.style.width = `${cellSize}px`;
+            cell.style.height = `${cellSize}px`;
+            // Adjust font size based on cell size
+            cell.style.fontSize = `${Math.max(cellSize * 0.5, 10)}px`;
+        });
+    } else {
+        // Original desktop behavior
+        const cells = document.querySelectorAll('.cell');
+        cells.forEach(cell => {
+            const width = cell.offsetWidth;
+            cell.style.height = width + 'px';
+        });
+    }
+}
