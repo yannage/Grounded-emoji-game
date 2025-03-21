@@ -1,6 +1,58 @@
 // Character movement and interactions
 // Handles player and parents movement, and discovery
 
+// Animate player movement
+function animatePlayerMovement(startX, startY, endX, endY) {
+    // Create a temporary element for animation
+    const playerElement = document.createElement("div");
+    playerElement.textContent = "👦";
+    playerElement.className = "cell player-moving";
+    document.body.appendChild(playerElement);
+    
+    // Position at start
+    const startCell = document.querySelector(`.cell[data-x="${startX}"][data-y="${startY}"]`);
+    const endCell = document.querySelector(`.cell[data-x="${endX}"][data-y="${endY}"]`);
+    const startRect = startCell.getBoundingClientRect();
+    const endRect = endCell.getBoundingClientRect();
+    
+    playerElement.style.position = "fixed";
+    playerElement.style.left = `${startRect.left}px`;
+    playerElement.style.top = `${startRect.top}px`;
+    playerElement.style.width = `${startRect.width}px`;
+    playerElement.style.height = `${startRect.height}px`;
+    playerElement.style.display = "flex";
+    playerElement.style.justifyContent = "center";
+    playerElement.style.alignItems = "center";
+    
+    // Animate
+    const animationDuration = 500; // 500ms
+    const startTime = performance.now();
+    
+    function animate(currentTime) {
+        const elapsedTime = currentTime - startTime;
+        const progress = Math.min(elapsedTime / animationDuration, 1);
+        
+        const currentX = startRect.left + (endRect.left - startRect.left) * progress;
+        const currentY = startRect.top + (endRect.top - startRect.top) * progress;
+        
+        playerElement.style.left = `${currentX}px`;
+        playerElement.style.top = `${currentY}px`;
+        
+        if (progress < 1) {
+            requestAnimationFrame(animate);
+        } else {
+            // Animation complete, remove the element
+            document.body.removeChild(playerElement);
+            
+            // Update the grid to show the player in the new position
+            renderGrid();
+        }
+    }
+    
+    requestAnimationFrame(animate);
+}
+
+
 // Move character towards target
 function moveCharacterTowardsTarget(position, target) {
     // Calculate direction
@@ -162,7 +214,7 @@ function checkParentDiscovery() {
     return false;
 }
 
-// Handle cell click for player movement
+// handleCellClick
 function handleCellClick(x, y) {
     // Check if TV click
     if (gameState.tvLocations.some(tv => tv.x === x && tv.y === y) && 
@@ -180,19 +232,26 @@ function handleCellClick(x, y) {
     if (gameState.movesLeft > 0) {
         const distance = Math.abs(gameState.playerPosition.x - x) + Math.abs(gameState.playerPosition.y - y);
         if (distance > 0 && distance <= gameState.movesLeft && isValidMove(x, y)) {
-            // Move player
+            // Store old position
+            const oldX = gameState.playerPosition.x;
+            const oldY = gameState.playerPosition.y;
+            
+            // Update game state
             gameState.playerPosition = { x, y };
             gameState.movesLeft -= distance;
+            
+            // Animate movement
+            animatePlayerMovement(oldX, oldY, x, y);
             
             // Check if discovered by parents
             checkParentDiscovery();
             
-            // Update UI
+            // Update UI (but don't render grid yet - waiting for animation)
             updateUI();
-            renderGrid();
         }
     }
 }
+            
 
 // Toggle hiding
 function toggleHiding() {
