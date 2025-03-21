@@ -1,42 +1,1229 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Grounded: TV Time</title>
-  <link rel="stylesheet" href="style.css"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grounded! - The Sneaky TV Watching Game</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        #game-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+            max-width: 800px;
+        }
+        
+        #house-grid {
+            display: grid;
+            grid-template-columns: repeat(15, 40px);
+            grid-template-rows: repeat(12, 40px);
+            gap: 1px;
+            background-color: #333;
+            padding: 5px;
+            border-radius: 5px;
+        }
+        
+        .cell {
+            width: 40px;
+            height: 40px;
+            background-color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            user-select: none;
+            position: relative;
+        }
+        
+        .wall {
+            background-color: #666;
+        }
+        
+        .floor {
+            background-color: #f8f8f8;
+            cursor: pointer;
+        }
+        
+        .floor.bedroom {
+            background-color: #ffd7d7;
+        }
+        
+        .floor.living-room {
+            background-color: #d7d7ff;
+        }
+        
+        .floor.kitchen {
+            background-color: #d7ffd7;
+        }
+        
+        .floor.office {
+            background-color: #ffffd7;
+        }
+        
+        .floor.bathroom {
+            background-color: #d7ffff;
+        }
+        
+        .floor.attic {
+            background-color: #eaeaea;
+        }
+        
+        .floor.basement {
+            background-color: #c0c0c0;
+        }
+        
+        .floor.reachable {
+            border: 2px dashed #00ff00;
+        }
+        
+        .door {
+            background-color: #a05a2c;
+            cursor: pointer;
+        }
+        
+        .door.locked {
+            background-color: #8b4513;
+        }
+        
+        .info-panel {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        
+        button {
+            padding: 5px 10px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        .tv-status {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            font-size: 10px;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 2px;
+            border-radius: 2px;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            z-index: 100;
+            display: none;
+        }
+        
+        #game-over-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 400px;
+        }
+        
+        #upgrade-panel {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .upgrade-item {
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+        }
+        
+        .upgrade-item:hover {
+            background-color: #e0e0e0;
+        }
+        
+        .upgrade-item.owned {
+            background-color: #d7ffd7;
+        }
+        
+        .stats {
+            margin-top: 10px;
+            text-align: left;
+        }
+    </style>
 </head>
 <body>
-  <div id="game">
-    <div id="house">
-      <div class="room" id="bedroom">🛏️ Bedroom <div class="tv" data-room="bedroom">📺</div></div>
-      <div class="room" id="livingroom">🛋️ Living Room <div class="tv" data-room="livingroom">📺</div></div>
-      <div class="room" id="bathroom">🚽 Bathroom</div>
-      <div class="room" id="parentsroom">🛏️ Parents’ Room <div class="tv" data-room="parentsroom">📺</div></div>
-      <div class="room" id="basement">🪜 Basement <div class="tv" data-room="basement">📺</div></div>
+    <h1>Grounded! 📺</h1>
+    <div id="game-container">
+        <div class="info-panel">
+            <div>
+                <div>Time: <span id="game-time">8:00 AM</span></div>
+                <div>Day: <span id="day-counter">1</span> of <span id="grounded-days">3</span></div>
+                <div>Moves Left: <span id="moves-counter">3</span></div>
+            </div>
+            <div>
+                <div>Score: <span id="score-display">0</span></div>
+                <div>Total Points: <span id="total-points-display">0</span></div>
+                <div>Next Show: <span id="next-show-time">9:00 AM</span> (<span id="next-show-length">30</span> min)</div>
+            </div>
+        </div>
+        
+        <div id="house-grid"></div>
+        
+        <div class="controls">
+            <button id="hide-button" disabled>Hide 🫥</button>
+            <button id="lock-door-button" disabled>Lock Door 🔒</button>
+            <button id="end-turn-button">End Turn ⏭️</button>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification"></div>
+    
+    <div id="game-over-modal">
+        <div class="modal-content">
+            <h2 id="game-over-title">Game Over!</h2>
+            <p id="game-over-message">You were caught watching TV!</p>
+            <div class="stats">
+                <p>Final Score: <span id="final-score">0</span></p>
+                <p>Shows Watched: <span id="shows-watched">0</span></p>
+                <p>Total Points Earned: <span id="points-earned">0</span></p>
+            </div>
+            <h3>Spend your points on upgrades:</h3>
+            <div id="upgrade-panel">
+                <!-- Upgrades will be added here -->
+            </div>
+            <button id="restart-button">Start Next Grounding</button>
+        </div>
     </div>
 
-    <div id="characters">
-      <div id="kid">🧒</div>
-      <div id="parent">👨‍🦰</div>
-    </div>
+    <script>
+        // Game state
+        const gameState = {
+            time: 8 * 60, // Start at 8:00 AM (in minutes)
+            day: 1,
+            groundedDays: 3,
+            score: 0,
+            totalPoints: 0,
+            movesLeft: 3,
+            playerPosition: { x: 2, y: 2 },
+            playerHiding: false,
+            dadPosition: { x: 7, y: 2 },
+            momPosition: { x: 8, y: 2 },
+            dadTarget: null,
+            momTarget: null,
+            suspicion: 0,
+            currentShow: null,
+            upcomingShows: [],
+            watchingTV: false,
+            tvLocations: [],
+            doorLocations: [],
+            lockedDoors: [],
+            trashBins: [],
+            endOfDay: 22 * 60, // End of day at 10:00 PM
+            showsWatched: 0,
+            upgrades: {
+                mobilePhone: { owned: false, cost: 1000, description: "Mobile Phone 📱 - Watch shows anywhere" },
+                biggerTV: { owned: false, cost: 500, description: "Bigger TV 📺 - Earn 2x points" },
+                videoGame: { owned: false, cost: 750, description: "Video Game 🎮 - Alternative entertainment" },
+                quietShoes: { owned: false, cost: 300, description: "Quiet Shoes 👟 - Move 4 spaces per turn" },
+                lockpick: { owned: false, cost: 200, description: "Lockpick 🔑 - Unlock doors" },
+                snacks: { owned: false, cost: 150, description: "Snacks 🍿 - +50% points when watching TV" }
+            }
+        };
 
-    <div id="ui">
-      <div id="clock">Time: 12:30</div>
-      <div id="showAlert"></div>
-      <div id="controls">
-        <button onclick="hide()">Hide</button>
-        <button onclick="lockDoor()">Lock Door</button>
-      </div>
-    </div>
+        // House layout
+        const ROOMS = {
+            WALL: "wall",
+            FLOOR: "floor",
+            DOOR: "door",
+            BEDROOM1: "bedroom",
+            BEDROOM2: "bedroom",
+            BEDROOM3: "bedroom",
+            LIVING_ROOM: "living-room",
+            KITCHEN: "kitchen",
+            OFFICE: "office",
+            BATHROOM: "bathroom",
+            ATTIC: "attic",
+            BASEMENT: "basement"
+        };
 
-    <div id="statsScreen" class="hidden">
-      <h2>Day Over!</h2>
-      <div id="statsContent"></div>
-      <button onclick="startNewDay()">Start New Day</button>
-    </div>
-  </div>
+        // Initialize the house grid
+        const houseGrid = [];
+        const width = 15;
+        const height = 12;
 
-  <script src="script.js"></script>
+        // Create empty grid
+        for (let y = 0; y < height; y++) {
+            houseGrid[y] = [];
+            for (let x = 0; x < width; x++) {
+                houseGrid[y][x] = { type: ROOMS.WALL, content: "", room: "" };
+            }
+        }
+
+        // Define rooms
+        // Main bedroom (parents)
+        for (let y = 1; y < 4; y++) {
+            for (let x = 6; x < 10; x++) {
+                houseGrid[y][x] = { type: ROOMS.FLOOR, content: "", room: ROOMS.BEDROOM1 };
+            }
+        }
+        houseGrid[1][7] = { type: ROOMS.FLOOR, content: "🛏️", room: ROOMS.BEDROOM1 };
+        houseGrid[1][8] = { type: ROOMS.FLOOR, content: "🛏️", room: ROOMS.BEDROOM1 };
+        houseGrid[3][9] = { type: ROOMS.FLOOR, content: "📺", room: ROOMS.BEDROOM1 };
+        gameState.tvLocations.push({ x: 9, y: 3 });
+        houseGrid[3][6] = { type: ROOMS.DOOR, content: "", room: ROOMS.BEDROOM1 };
+        gameState.doorLocations.push({ x: 6, y: 3 });
+
+        // Kids bedroom (player)
+        for (let y = 1; y < 4; y++) {
+            for (let x = 1; x < 5; x++) {
+                houseGrid[y][x] = { type: ROOMS.FLOOR, content: "", room: ROOMS.BEDROOM2 };
+            }
+        }
+        houseGrid[1][2] = { type: ROOMS.FLOOR, content: "🛏️", room: ROOMS.BEDROOM2 };
+        houseGrid[3][4] = { type: ROOMS.FLOOR, content: "📺", room: ROOMS.BEDROOM2 };
+        gameState.tvLocations.push({ x: 4, y: 3 });
+        houseGrid[1][4] = { type: ROOMS.FLOOR, content: "🗑️", room: ROOMS.BEDROOM2 };
+        gameState.trashBins.push({ x: 4, y: 1 });
+        houseGrid[3][1] = { type: ROOMS.DOOR, content: "", room: ROOMS.BEDROOM2 };
+        gameState.doorLocations.push({ x: 1, y: 3 });
+
+        // Guest bedroom
+        for (let y = 1; y < 4; y++) {
+            for (let x = 11; x < 14; x++) {
+                houseGrid[y][x] = { type: ROOMS.FLOOR, content: "", room: ROOMS.BEDROOM3 };
+            }
+        }
+        houseGrid[1][12] = { type: ROOMS.FLOOR, content: "🛋️", room: ROOMS.BEDROOM3 };
+        houseGrid[3][13] = { type: ROOMS.FLOOR, content: "📺", room: ROOMS.BEDROOM3 };
+        gameState.tvLocations.push({ x: 13, y: 3 });
+        houseGrid[3][11] = { type: ROOMS.DOOR, content: "", room: ROOMS.BEDROOM3 };
+        gameState.doorLocations.push({ x: 11, y: 3 });
+
+        // Living room
+        for (let y = 4; y < 8; y++) {
+            for (let x = 6; x < 12; x++) {
+                houseGrid[y][x] = { type: ROOMS.FLOOR, content: "", room: ROOMS.LIVING_ROOM };
+            }
+        }
+        houseGrid[5][8] = { type: ROOMS.FLOOR, content: "🛋️", room: ROOMS.LIVING_ROOM };
+        houseGrid[5][9] = { type: ROOMS.FLOOR, content: "🛋️", room: ROOMS.LIVING_ROOM };
+        houseGrid[6][10] = { type: ROOMS.FLOOR, content: "📺", room: ROOMS.LIVING_ROOM };
+        gameState.tvLocations.push({ x: 10, y: 6 });
+        houseGrid[7][6] = { type: ROOMS.FLOOR, content: "🗑️", room: ROOMS.LIVING_ROOM };
+        gameState.trashBins.push({ x: 6, y: 7 });
+        houseGrid[4][6] = { type: ROOMS.DOOR, content: "", room: ROOMS.LIVING_ROOM };
+        gameState.doorLocations.push({ x: 6, y: 4 });
+        houseGrid[4][11] = { type: ROOMS.DOOR, content: "", room: ROOMS.LIVING_ROOM };
+        gameState.doorLocations.push({ x: 11, y: 4 });
+        houseGrid[7][8] = { type: ROOMS.DOOR, content: "", room: ROOMS.LIVING_ROOM };
+        gameState.doorLocations.push({ x: 8, y: 7 });
+
+        // Kitchen
+        for (let y = 4; y < 8; y++) {
+            for (let x = 1; x < 5; x++) {
+                houseGrid[y][x] = { type: ROOMS.FLOOR, content: "", room: ROOMS.KITCHEN };
+            }
+        }
+        houseGrid[5][1] = { type: ROOMS.FLOOR, content: "🍳", room: ROOMS.KITCHEN };
+        houseGrid[5][2] = { type: ROOMS.FLOOR, content: "🍽️", room: ROOMS.KITCHEN };
+        houseGrid[4][4] = { type: ROOMS.DOOR, content: "", room: ROOMS.KITCHEN };
+        gameState.doorLocations.push({ x: 4, y: 4 });
+        houseGrid[6][1] = { type: ROOMS.FLOOR, content: "🗑️", room: ROOMS.KITCHEN };
+        gameState.trashBins.push({ x: 1, y: 6 });
+
+        // Office
+        for (let y = 4; y < 8; y++) {
+            for (let x = 12; x < 14; x++) {
+                houseGrid[y][x] = { type: ROOMS.FLOOR, content: "", room: ROOMS.OFFICE };
+            }
+        }
+        houseGrid[5][13] = { type: ROOMS.FLOOR, content: "💻", room: ROOMS.OFFICE };
+        houseGrid[6][13] = { type: ROOMS.FLOOR, content: "🗑️", room: ROOMS.OFFICE };
+        gameState.trashBins.push({ x: 13, y: 6 });
+        houseGrid[4][12] = { type: ROOMS.DOOR, content: "", room: ROOMS.OFFICE };
+        gameState.doorLocations.push({ x: 12, y: 4 });
+
+        // Bathroom
+        for (let y = 4; y < 6; y++) {
+            for (let x = 3; x < 5; x++) {
+                houseGrid[y][x] = { type: ROOMS.FLOOR, content: "", room: ROOMS.BATHROOM };
+            }
+        }
+        houseGrid[4][3] = { type: ROOMS.FLOOR, content: "🚽", room: ROOMS.BATHROOM };
+        houseGrid[5][4] = { type: ROOMS.FLOOR, content: "🛁", room: ROOMS.BATHROOM };
+        houseGrid[5][3] = { type: ROOMS.DOOR, content: "", room: ROOMS.BATHROOM };
+        gameState.doorLocations.push({ x: 3, y: 5 });
+
+        // Hallway
+        for (let y = 4; y < 8; y++) {
+            for (let x = 5; x < 6; x++) {
+                houseGrid[y][x] = { type: ROOMS.FLOOR, content: "", room: "hallway" };
+            }
+        }
+        
+        // Hallway - upstairs
+        for (let y = 3; y < 4; y++) {
+            for (let x = 1; x < 14; x++) {
+                if (houseGrid[y][x].type === ROOMS.WALL) {
+                    houseGrid[y][x] = { type: ROOMS.FLOOR, content: "", room: "hallway" };
+                }
+            }
+        }
+
+        // Attic
+        for (let y = 0; y < 1; y++) {
+            for (let x = 11; x < 14; x++) {
+                houseGrid[y][x] = { type: ROOMS.FLOOR, content: "", room: ROOMS.ATTIC };
+            }
+        }
+        houseGrid[0][12] = { type: ROOMS.FLOOR, content: "📦", room: ROOMS.ATTIC };
+        houseGrid[0][13] = { type: ROOMS.FLOOR, content: "🗑️", room: ROOMS.ATTIC };
+        gameState.trashBins.push({ x: 13, y: 0 });
+        houseGrid[1][12] = { type: ROOMS.DOOR, content: "", room: ROOMS.ATTIC };
+        gameState.doorLocations.push({ x: 12, y: 1 });
+
+        // Basement
+        for (let y = 8; y < 11; y++) {
+            for (let x = 3; x < 8; x++) {
+                houseGrid[y][x] = { type: ROOMS.FLOOR, content: "", room: ROOMS.BASEMENT };
+            }
+        }
+        houseGrid[9][4] = { type: ROOMS.FLOOR, content: "🧸", room: ROOMS.BASEMENT };
+        houseGrid[9][6] = { type: ROOMS.FLOOR, content: "📺", room: ROOMS.BASEMENT };
+        gameState.tvLocations.push({ x: 6, y: 9 });
+        houseGrid[10][3] = { type: ROOMS.FLOOR, content: "🗑️", room: ROOMS.BASEMENT };
+        gameState.trashBins.push({ x: 3, y: 10 });
+        houseGrid[8][5] = { type: ROOMS.DOOR, content: "", room: ROOMS.BASEMENT };
+        gameState.doorLocations.push({ x: 5, y: 8 });
+
+        // Stairs
+        houseGrid[7][5] = { type: ROOMS.FLOOR, content: "🪜", room: "stairs" };
+        houseGrid[8][5] = { type: ROOMS.FLOOR, content: "🪜", room: "stairs" };
+
+        // Render the house grid
+        function renderGrid() {
+            const gridElement = document.getElementById("house-grid");
+            gridElement.innerHTML = "";
+            
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    const cell = document.createElement("div");
+                    const cellData = houseGrid[y][x];
+                    
+                    cell.className = `cell ${cellData.type}`;
+                    if (cellData.room) {
+                        cell.classList.add(cellData.room);
+                    }
+                    
+                    // Add door status
+                    if (cellData.type === ROOMS.DOOR) {
+                        if (gameState.lockedDoors.some(door => door.x === x && door.y === y)) {
+                            cell.classList.add("locked");
+                            cell.textContent = "🔒";
+                        } else {
+                            cell.textContent = "🚪";
+                        }
+                    }
+                    // Add content (furniture, etc.)
+                    else if (cellData.content) {
+                        cell.textContent = cellData.content;
+                    }
+                    
+                    // Add TV status
+                    if (gameState.tvLocations.some(tv => tv.x === x && tv.y === y)) {
+                        const tvStatus = document.createElement("div");
+                        tvStatus.className = "tv-status";
+                        
+                        if (gameState.watchingTV && gameState.playerPosition.x === x && gameState.playerPosition.y === y) {
+                            tvStatus.textContent = "ON";
+                            cell.style.color = "red";  // TV is on
+                        } else {
+                            tvStatus.textContent = "OFF";
+                        }
+                        
+                        cell.appendChild(tvStatus);
+                    }
+                    
+                    // Add characters
+                    if (gameState.playerPosition.x === x && gameState.playerPosition.y === y) {
+                        if (gameState.playerHiding) {
+                            cell.textContent = "🫥";
+                        } else {
+                            cell.textContent = "👦";
+                        }
+                    } else if (gameState.dadPosition.x === x && gameState.dadPosition.y === y) {
+                        cell.textContent = "👨";
+                    } else if (gameState.momPosition.x === x && gameState.momPosition.y === y) {
+                        cell.textContent = "👩";
+                    }
+                    
+                    // Highlight reachable cells
+                    if (gameState.movesLeft > 0 && !gameState.playerHiding) {
+                        const distance = Math.abs(gameState.playerPosition.x - x) + Math.abs(gameState.playerPosition.y - y);
+                        if (distance > 0 && distance <= gameState.movesLeft && isValidMove(x, y)) {
+                            cell.classList.add("reachable");
+                        }
+                    }
+                    
+                    // Add click event
+                    cell.dataset.x = x;
+                    cell.dataset.y = y;
+                    cell.addEventListener("click", () => handleCellClick(x, y));
+                    
+                    gridElement.appendChild(cell);
+                }
+            }
+        }
+
+        // Check if a move is valid
+        function isValidMove(x, y) {
+            // Check if cell is a wall
+            if (houseGrid[y][x].type === ROOMS.WALL) {
+                return false;
+            }
+            
+            // Check if cell has a parent
+            if (gameState.dadPosition.x === x && gameState.dadPosition.y === y ||
+                gameState.momPosition.x === x && gameState.momPosition.y === y) {
+                return false;
+            }
+            
+            // Check if door is locked
+            if (houseGrid[y][x].type === ROOMS.DOOR && 
+                gameState.lockedDoors.some(door => door.x === x && door.y === y)) {
+                return false;
+            }
+            
+            // Check if move is through a door or follows a path
+            const playerX = gameState.playerPosition.x;
+            const playerY = gameState.playerPosition.y;
+            
+            // If moving diagonally, ensure there's a clear path
+            if (playerX !== x && playerY !== y) {
+                return false;
+            }
+            
+            // Check if path is clear
+            if (playerX === x) {
+                // Moving vertically
+                const start = Math.min(playerY, y);
+                const end = Math.max(playerY, y);
+                for (let i = start + 1; i < end; i++) {
+                    if (houseGrid[i][x].type === ROOMS.WALL || 
+                        (houseGrid[i][x].type === ROOMS.DOOR && 
+                         gameState.lockedDoors.some(door => door.x === x && door.y === i))) {
+                        return false;
+                    }
+                }
+            } else {
+                // Moving horizontally
+                const start = Math.min(playerX, x);
+                const end = Math.max(playerX, x);
+                for (let i = start + 1; i < end; i++) {
+                    if (houseGrid[y][i].type === ROOMS.WALL || 
+                        (houseGrid[y][i].type === ROOMS.DOOR && 
+                         gameState.lockedDoors.some(door => door.x === i && door.y === y))) {
+                        return false;
+                    }
+                }
+            }
+            
+            return true;
+        }
+
+        // Handle cell click
+        function handleCellClick(x, y) {
+            // Check if TV click
+            if (gameState.tvLocations.some(tv => tv.x === x && tv.y === y) && 
+                gameState.playerPosition.x === x && gameState.playerPosition.y === y) {
+                toggleTV();
+                return;
+            }
+            
+            // Don't allow moves when hiding
+            if (gameState.playerHiding) {
+                return;
+            }
+            
+            // Check if valid move
+            if (gameState.movesLeft > 0) {
+                const distance = Math.abs(gameState.playerPosition.x - x) + Math.abs(gameState.playerPosition.y - y);
+                if (distance > 0 && distance <= gameState.movesLeft && isValidMove(x, y)) {
+                    // Move player
+                    gameState.playerPosition = { x, y };
+                    gameState.movesLeft -= distance;
+                    
+                    // Check if discovered by parents
+                    checkParentDiscovery();
+                    
+                    // Update UI
+                    updateUI();
+                    renderGrid();
+                }
+            }
+        }
+
+        // Toggle TV on/off
+        function toggleTV() {
+            // Check if at a TV
+            if (gameState.tvLocations.some(tv => 
+                tv.x === gameState.playerPosition.x && tv.y === gameState.playerPosition.y)) {
+                gameState.watchingTV = !gameState.watchingTV;
+                
+                // Check if a show is on
+                if (gameState.watchingTV) {
+                    checkForShow();
+                } else {
+                    gameState.currentShow = null;
+                }
+                
+                // Increase suspicion
+                if (gameState.watchingTV) {
+                    gameState.suspicion += 10;
+                    showNotification("TV turned ON! Parents' suspicion increased!");
+                } else {
+                    showNotification("TV turned OFF");
+                }
+                
+                // Update UI
+                updateUI();
+                renderGrid();
+            }
+        }
+
+        // Check if a show is on
+        function checkForShow() {
+            if (!gameState.watchingTV) return;
+            
+            // Check if already watching a show
+            if (gameState.currentShow) return;
+            
+            // Check if a show is starting
+            for (const show of gameState.upcomingShows) {
+                if (show.startTime <= gameState.time && 
+                    (gameState.time < show.startTime + show.duration)) {
+                    
+                    gameState.currentShow = show;
+                    
+                    // Calculate points
+                    let points = show.duration;
+                    
+                    // Apply multipliers
+                    if (gameState.upgrades.biggerTV.owned) {
+                        points *= 2;
+                    }
+                    
+                    if (gameState.upgrades.snacks.owned) {
+                        points = Math.floor(points * 1.5);
+                    }
+                    
+                    gameState.score += points;
+                    gameState.totalPoints += points;
+                    gameState.showsWatched++;
+                    
+                    showNotification(`You started watching "${show.title}"! +${points} points!`);
+                    break;
+                }
+            }
+        }
+
+        // End player turn
+        function endTurn() {
+            // Reset moves
+            gameState.movesLeft = gameState.upgrades.quietShoes.owned ? 4 : 3;
+            
+            // Advance time
+            gameState.time += 30; // 30 minutes pass
+            
+            // Check if show ended
+            if (gameState.currentShow && gameState.time >= gameState.currentShow.startTime + gameState.currentShow.duration) {
+                gameState.currentShow = null;
+                showNotification("The show has ended");
+            }
+            
+            // Move parents
+            moveParents();
+            
+            // Generate shows if needed
+            if (gameState.upcomingShows.length < 3) {
+                generateShows();
+            }
+            
+            // Check if game ended
+            if (gameState.time >= gameState.endOfDay) {
+                endDay();
+                return;
+            }
+            
+            // Check if player is caught
+            checkParentDiscovery();
+            
+            // Check if new show started
+            checkForShow();
+            
+            // Update UI
+            updateUI();
+            renderGrid();
+        }
+
+        // Move parents
+        function moveParents() {
+            // Dad's movement pattern: bedroom -> office -> living room
+            if (!gameState.dadTarget) {
+                if (isInRoom(gameState.dadPosition, ROOMS.BEDROOM1)) {
+                    gameState.dadTarget = findCenterOfRoom(ROOMS.OFFICE);
+                } else if (isInRoom(gameState.dadPosition, ROOMS.OFFICE)) {
+                    gameState.dadTarget = findCenterOfRoom(ROOMS.LIVING_ROOM);
+                }
+                } else if (isInRoom(gameState.dadPosition, ROOMS.LIVING_ROOM)) {
+                    gameState.dadTarget = findCenterOfRoom(ROOMS.BEDROOM1);
+                } else {
+                    // If not in a defined room, go to bedroom
+                    gameState.dadTarget = findCenterOfRoom(ROOMS.BEDROOM1);
+                }
+            }
+            
+            // Move dad towards target
+            if (gameState.dadTarget) {
+                moveCharacterTowardsTarget(gameState.dadPosition, gameState.dadTarget);
+                
+                // Check if dad reached target
+                if (gameState.dadPosition.x === gameState.dadTarget.x && 
+                    gameState.dadPosition.y === gameState.dadTarget.y) {
+                    gameState.dadTarget = null;
+                }
+            }
+            
+            // Mom's movement pattern: bedroom -> kitchen -> attic -> basement
+            if (!gameState.momTarget) {
+                if (isInRoom(gameState.momPosition, ROOMS.BEDROOM1)) {
+                    gameState.momTarget = findCenterOfRoom(ROOMS.KITCHEN);
+                } else if (isInRoom(gameState.momPosition, ROOMS.KITCHEN)) {
+                    gameState.momTarget = findCenterOfRoom(ROOMS.ATTIC);
+                } else if (isInRoom(gameState.momPosition, ROOMS.ATTIC)) {
+                    gameState.momTarget = findCenterOfRoom(ROOMS.BASEMENT);
+                } else if (isInRoom(gameState.momPosition, ROOMS.BASEMENT)) {
+                    gameState.momTarget = findCenterOfRoom(ROOMS.BEDROOM1);
+                } else {
+                    // If not in a defined room, go to bedroom
+                    gameState.momTarget = findCenterOfRoom(ROOMS.BEDROOM1);
+                }
+            }
+            
+            // Move mom towards target
+            if (gameState.momTarget) {
+                moveCharacterTowardsTarget(gameState.momPosition, gameState.momTarget);
+                
+                // Check if mom reached target
+                if (gameState.momPosition.x === gameState.momTarget.x && 
+                    gameState.momPosition.y === gameState.momTarget.y) {
+                    gameState.momTarget = null;
+                }
+            }
+            
+            // Check if TV is on or suspicion is high, parents might change route
+            if (gameState.watchingTV || gameState.suspicion > 50) {
+                // 30% chance to change route if TV is on
+                if (Math.random() < 0.3) {
+                    // Dad might check other bedrooms or bathroom
+                    if (Math.random() < 0.5) {
+                        gameState.dadTarget = findCenterOfRoom(ROOMS.BEDROOM2);
+                    } else {
+                        gameState.dadTarget = findCenterOfRoom(ROOMS.BATHROOM);
+                    }
+                    
+                    // Mom might check other bedrooms or bathroom
+                    if (Math.random() < 0.5) {
+                        gameState.momTarget = findCenterOfRoom(ROOMS.BEDROOM3);
+                    } else {
+                        gameState.momTarget = findCenterOfRoom(ROOMS.BATHROOM);
+                    }
+                }
+            }
+            
+            // Gradually reduce suspicion
+            if (gameState.suspicion > 0) {
+                gameState.suspicion -= 1;
+            }
+        }
+
+        // Check if player is in a specific room
+        function isInRoom(position, roomType) {
+            return houseGrid[position.y][position.x].room === roomType;
+        }
+
+        // Find the center of a specific room
+        function findCenterOfRoom(roomType) {
+            const roomCells = [];
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    if (houseGrid[y][x].room === roomType) {
+                        roomCells.push({x, y});
+                    }
+                }
+            }
+            
+            if (roomCells.length === 0) {
+                return { x: 7, y: 3 }; // Default to hallway
+            }
+            
+            // Calculate center of room
+            const centerIndex = Math.floor(roomCells.length / 2);
+            return roomCells[centerIndex];
+        }
+
+        // Move character towards target
+        function moveCharacterTowardsTarget(position, target) {
+            // Calculate direction
+            const dx = target.x - position.x;
+            const dy = target.y - position.y;
+            
+            // Move horizontally or vertically (not diagonally)
+            if (Math.abs(dx) > Math.abs(dy)) {
+                // Move horizontally
+                if (dx > 0) {
+                    // Move right if possible
+                    if (canMoveTo(position.x + 1, position.y)) {
+                        position.x += 1;
+                    } else if (dy !== 0 && canMoveTo(position.x, position.y + (dy > 0 ? 1 : -1))) {
+                        // Try vertical movement if horizontal is blocked
+                        position.y += (dy > 0 ? 1 : -1);
+                    }
+                } else {
+                    // Move left if possible
+                    if (canMoveTo(position.x - 1, position.y)) {
+                        position.x -= 1;
+                    } else if (dy !== 0 && canMoveTo(position.x, position.y + (dy > 0 ? 1 : -1))) {
+                        // Try vertical movement if horizontal is blocked
+                        position.y += (dy > 0 ? 1 : -1);
+                    }
+                }
+            } else {
+                // Move vertically
+                if (dy > 0) {
+                    // Move down if possible
+                    if (canMoveTo(position.x, position.y + 1)) {
+                        position.y += 1;
+                    } else if (dx !== 0 && canMoveTo(position.x + (dx > 0 ? 1 : -1), position.y)) {
+                        // Try horizontal movement if vertical is blocked
+                        position.x += (dx > 0 ? 1 : -1);
+                    }
+                } else {
+                    // Move up if possible
+                    if (canMoveTo(position.x, position.y - 1)) {
+                        position.y -= 1;
+                    } else if (dx !== 0 && canMoveTo(position.x + (dx > 0 ? 1 : -1), position.y)) {
+                        // Try horizontal movement if vertical is blocked
+                        position.x += (dx > 0 ? 1 : -1);
+                    }
+                }
+            }
+        }
+
+        // Check if a character can move to a specific cell
+        function canMoveTo(x, y) {
+            // Check boundaries
+            if (x < 0 || x >= width || y < 0 || y >= height) {
+                return false;
+            }
+            
+            // Check if wall
+            if (houseGrid[y][x].type === ROOMS.WALL) {
+                return false;
+            }
+            
+            // Check if locked door
+            if (houseGrid[y][x].type === ROOMS.DOOR && 
+                gameState.lockedDoors.some(door => door.x === x && door.y === y)) {
+                return false;
+            }
+            
+            return true;
+        }
+
+        // Check if player is discovered by parents
+        function checkParentDiscovery() {
+            if (gameState.playerHiding) {
+                return false;
+            }
+            
+            // Check if in same cell as a parent
+            if ((gameState.playerPosition.x === gameState.dadPosition.x && 
+                 gameState.playerPosition.y === gameState.dadPosition.y) ||
+                (gameState.playerPosition.x === gameState.momPosition.x && 
+                 gameState.playerPosition.y === gameState.momPosition.y)) {
+                
+                if (gameState.watchingTV) {
+                    playerCaught("You were caught watching TV!");
+                    return true;
+                }
+            }
+            
+            // Check if adjacent to a parent
+            const adjacentToDad = Math.abs(gameState.playerPosition.x - gameState.dadPosition.x) + 
+                                 Math.abs(gameState.playerPosition.y - gameState.dadPosition.y) <= 1;
+                                 
+            const adjacentToMom = Math.abs(gameState.playerPosition.x - gameState.momPosition.x) + 
+                                 Math.abs(gameState.playerPosition.y - gameState.momPosition.y) <= 1;
+            
+            if ((adjacentToDad || adjacentToMom) && gameState.watchingTV) {
+                playerCaught("A parent heard the TV and caught you!");
+                return true;
+            }
+            
+            return false;
+        }
+
+        // Player is caught
+        function playerCaught(message) {
+            showGameOver(message);
+        }
+
+        // End the day
+        function endDay() {
+            gameState.day++;
+            
+            if (gameState.day > gameState.groundedDays) {
+                showGameOver("Your grounding is over! You survived!");
+            } else {
+                // Reset for next day
+                gameState.time = 8 * 60; // 8:00 AM
+                gameState.playerPosition = { x: 2, y: 2 };
+                gameState.playerHiding = false;
+                gameState.dadPosition = { x: 7, y: 2 };
+                gameState.momPosition = { x: 8, y: 2 };
+                gameState.dadTarget = null;
+                gameState.momTarget = null;
+                gameState.suspicion = 0;
+                gameState.currentShow = null;
+                gameState.upcomingShows = [];
+                gameState.watchingTV = false;
+                gameState.movesLeft = gameState.upgrades.quietShoes.owned ? 4 : 3;
+                gameState.lockedDoors = [];
+                
+                // Generate shows for the new day
+                generateShows();
+                
+                showNotification(`Day ${gameState.day} of ${gameState.groundedDays} begins!`);
+                updateUI();
+                renderGrid();
+            }
+        }
+
+        // Show game over
+        function showGameOver(message) {
+            document.getElementById("game-over-title").textContent = "Game Over!";
+            document.getElementById("game-over-message").textContent = message;
+            document.getElementById("final-score").textContent = gameState.score;
+            document.getElementById("shows-watched").textContent = gameState.showsWatched;
+            document.getElementById("points-earned").textContent = gameState.totalPoints;
+            
+            // Show upgrades
+            const upgradePanel = document.getElementById("upgrade-panel");
+            upgradePanel.innerHTML = "";
+            
+            for (const [key, upgrade] of Object.entries(gameState.upgrades)) {
+                const upgradeItem = document.createElement("div");
+                upgradeItem.className = "upgrade-item";
+                if (upgrade.owned) {
+                    upgradeItem.classList.add("owned");
+                }
+                
+                upgradeItem.innerHTML = `
+                    <div>${upgrade.description}</div>
+                    <div>${upgrade.owned ? "Owned" : `Cost: ${upgrade.cost} pts`}</div>
+                `;
+                
+                if (!upgrade.owned && gameState.totalPoints >= upgrade.cost) {
+                    upgradeItem.addEventListener("click", () => {
+                        gameState.totalPoints -= upgrade.cost;
+                        upgrade.owned = true;
+                        
+                        upgradeItem.classList.add("owned");
+                        upgradeItem.innerHTML = `
+                            <div>${upgrade.description}</div>
+                            <div>Owned</div>
+                        `;
+                        
+                        document.getElementById("points-earned").textContent = gameState.totalPoints;
+                    });
+                }
+                
+                upgradePanel.appendChild(upgradeItem);
+            }
+            
+            document.getElementById("game-over-modal").style.display = "flex";
+        }
+
+        // Generate shows
+        function generateShows() {
+            // Clear old shows that have passed
+            gameState.upcomingShows = gameState.upcomingShows.filter(show => 
+                show.startTime + show.duration > gameState.time);
+                
+            // Add new shows
+            while (gameState.upcomingShows.length < 5) {
+                // Random start time between current time and end of day
+                const startTime = Math.floor(gameState.time + Math.random() * (gameState.endOfDay - gameState.time - 60));
+                
+                // Random duration (30 or 60 minutes)
+                const durations = [30, 60];
+                let duration = durations[Math.floor(Math.random() * durations.length)];
+                
+                // 10% chance for a marathon (3 hours)
+                if (Math.random() < 0.1) {
+                    duration = 180;
+                }
+                
+                
+// Generate show title
+const showTitles = [
+    "Cosmic Explorers",
+    "Ocean Friends",
+    "Mystery Falls",
+    "Galaxy Gems",
+    "Teen Heroes",
+    "The Incredible Life of Max",
+    "Star Princess vs. Evil",
+    "Element Masters",
+    "Park Pals",
+    "Summer Inventors",
+    "Robot High School",
+    "Monster Tamers",
+    "Dimension Hoppers",
+    "Magical Misfits",
+    "Cyber Warriors"
+];
+                
+                const title = showTitles[Math.floor(Math.random() * showTitles.length)];
+                
+                // Add show
+                gameState.upcomingShows.push({
+                    title,
+                    startTime,
+                    duration,
+                    marathon: duration === 180
+                });
+            }
+            
+            // Sort shows by start time
+            gameState.upcomingShows.sort((a, b) => a.startTime - b.startTime);
+        }
+
+        // Toggle hiding
+        function toggleHiding() {
+            // Check if player is near a trash bin
+            const nearTrashBin = gameState.trashBins.some(bin => 
+                Math.abs(gameState.playerPosition.x - bin.x) + 
+                Math.abs(gameState.playerPosition.y - bin.y) <= 1);
+                
+            if (nearTrashBin) {
+                gameState.playerHiding = !gameState.playerHiding;
+                
+                if (gameState.playerHiding) {
+                    showNotification("You're hiding! Parents can't see you.");
+                } else {
+                    showNotification("You stopped hiding.");
+                }
+                
+                updateUI();
+                renderGrid();
+            } else {
+                showNotification("You need to be near a trash bin to hide!");
+            }
+        }
+
+        // Toggle lock on door
+        function toggleDoorLock() {
+            // Check if player is near a door
+            let nearDoor = null;
+            for (const door of gameState.doorLocations) {
+                if (Math.abs(gameState.playerPosition.x - door.x) + 
+                    Math.abs(gameState.playerPosition.y - door.y) <= 1) {
+                    nearDoor = door;
+                    break;
+                }
+            }
+            
+            if (nearDoor) {
+                // Check if door is already locked
+                const isLocked = gameState.lockedDoors.some(
+                    door => door.x === nearDoor.x && door.y === nearDoor.y);
+                
+                if (isLocked) {
+                    // Unlock door
+                    gameState.lockedDoors = gameState.lockedDoors.filter(
+                        door => !(door.x === nearDoor.x && door.y === nearDoor.y));
+                    showNotification("Door unlocked!");
+                } else {
+                    // Lock door
+                    gameState.lockedDoors.push({...nearDoor});
+                    showNotification("Door locked! Parents can't enter.");
+                }
+                
+                updateUI();
+                renderGrid();
+            } else {
+                showNotification("You need to be near a door to lock/unlock it!");
+            }
+        }
+
+        // Update UI
+        function updateUI() {
+            // Update time
+            const hours = Math.floor(gameState.time / 60);
+            const minutes = gameState.time % 60;
+            const period = hours < 12 ? "AM" : "PM";
+            const hour12 = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+            
+            document.getElementById("game-time").textContent = 
+                `${hour12}:${minutes.toString().padStart(2, "0")} ${period}`;
+                
+            // Update day counter
+            document.getElementById("day-counter").textContent = gameState.day;
+            document.getElementById("grounded-days").textContent = gameState.groundedDays;
+            
+            // Update moves
+            document.getElementById("moves-counter").textContent = gameState.movesLeft;
+            
+            // Update score
+            document.getElementById("score-display").textContent = gameState.score;
+            document.getElementById("total-points-display").textContent = gameState.totalPoints;
+            
+            // Update next show
+            const nextShow = gameState.upcomingShows.find(show => show.startTime > gameState.time);
+            if (nextShow) {
+                const nextShowHours = Math.floor(nextShow.startTime / 60);
+                const nextShowMinutes = nextShow.startTime % 60;
+                const nextShowPeriod = nextShowHours < 12 ? "AM" : "PM";
+                const nextShowHour12 = nextShowHours === 0 ? 12 : nextShowHours > 12 ? nextShowHours - 12 : nextShowHours;
+                
+                document.getElementById("next-show-time").textContent = 
+                    `${nextShowHour12}:${nextShowMinutes.toString().padStart(2, "0")} ${nextShowPeriod}`;
+                document.getElementById("next-show-length").textContent = nextShow.duration;
+            } else {
+                document.getElementById("next-show-time").textContent = "None";
+                document.getElementById("next-show-length").textContent = "0";
+            }
+            
+            // Update action buttons
+            document.getElementById("hide-button").disabled = !gameState.trashBins.some(bin => 
+                Math.abs(gameState.playerPosition.x - bin.x) + 
+                Math.abs(gameState.playerPosition.y - bin.y) <= 1);
+                
+            document.getElementById("lock-door-button").disabled = !gameState.doorLocations.some(door => 
+                Math.abs(gameState.playerPosition.x - door.x) + 
+                Math.abs(gameState.playerPosition.y - door.y) <= 1);
+        }
+
+        // Show notification
+        function showNotification(message) {
+            const notification = document.getElementById("notification");
+            notification.textContent = message;
+            notification.style.display = "block";
+            
+            setTimeout(() => {
+                notification.style.display = "none";
+            }, 3000);
+        }
+
+        // Initialize game
+        function initGame() {
+            // Set up event listeners
+            document.getElementById("hide-button").addEventListener("click", toggleHiding);
+            document.getElementById("lock-door-button").addEventListener("click", toggleDoorLock);
+            document.getElementById("end-turn-button").addEventListener("click", endTurn);
+            document.getElementById("restart-button").addEventListener("click", () => {
+                document.getElementById("game-over-modal").style.display = "none";
+                
+                // Reset for new grounding
+                gameState.score = 0;
+                gameState.day = 1;
+                gameState.time = 8 * 60; // 8:00 AM
+                gameState.playerPosition = { x: 2, y: 2 };
+                gameState.playerHiding = false;
+                gameState.dadPosition = { x: 7, y: 2 };
+                gameState.momPosition = { x: 8, y: 2 };
+                gameState.dadTarget = null;
+                gameState.momTarget = null;
+                gameState.suspicion = 0;
+                gameState.currentShow = null;
+                gameState.upcomingShows = [];
+                gameState.watchingTV = false;
+                gameState.movesLeft = gameState.upgrades.quietShoes.owned ? 4 : 3;
+                gameState.lockedDoors = [];
+                gameState.showsWatched = 0;
+                
+                // Generate shows for the new game
+                generateShows();
+                
+                updateUI();
+                renderGrid();
+            });
+            
+            // Generate initial shows
+            generateShows();
+            
+            // Render the grid
+            renderGrid();
+            
+            // Update UI
+            updateUI();
+        }
+
+        // Start the game
+        initGame();
+    </script>
 </body>
 </html>
