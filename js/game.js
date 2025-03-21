@@ -115,6 +115,7 @@ function initGame() {
     // Set up event listeners
     document.getElementById("hide-button").addEventListener("click", toggleHiding);
     document.getElementById("lock-door-button").addEventListener("click", toggleDoorLock);
+    document.getElementById("tv-button").addEventListener("click", toggleTV); // Add this line
     document.getElementById("end-turn-button").addEventListener("click", endTurn);
     document.getElementById("restart-button").addEventListener("click", () => {
         document.getElementById("game-over-modal").style.display = "none";
