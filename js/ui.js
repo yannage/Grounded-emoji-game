@@ -242,3 +242,34 @@ function fixGridSizing() {
         });
     }
 }
+
+// Fix grid sizing issues
+function fixGridSizing() {
+    const gridContainer = document.getElementById("house-grid-container");
+    const gridElement = document.getElementById("house-grid");
+    
+    // For mobile, ensure proper scrolling
+    if (window.innerWidth < 600) {
+        // Make sure grid has minimum width to be usable
+        gridElement.style.minWidth = "380px";
+        
+        const cells = document.querySelectorAll('.cell');
+        const cellSize = Math.floor(gridElement.offsetWidth / 15); // 15 columns
+        
+        cells.forEach(cell => {
+            cell.style.width = `${cellSize}px`;
+            cell.style.height = `${cellSize}px`;
+            // Scale font size based on cell size
+            cell.style.fontSize = `${Math.max(cellSize * 0.5, 10)}px`;
+        });
+    } else {
+        // For desktop
+        const cells = document.querySelectorAll('.cell');
+        const cellSize = Math.floor(gridElement.offsetWidth / 15);
+        
+        cells.forEach(cell => {
+            cell.style.width = `${cellSize}px`;
+            cell.style.height = `${cellSize}px`;
+        });
+    }
+}
