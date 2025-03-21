@@ -243,10 +243,21 @@ function fixGridSizing() {
     }
 }
 
-// Fix grid sizing issues
+// Fix grid
 function fixGridSizing() {
-    const gridContainer = document.getElementById("house-grid-container");
     const gridElement = document.getElementById("house-grid");
+    const gridWidth = gridElement.offsetWidth;
+    const cellSize = Math.floor(gridWidth / 15); // 15 columns
+    
+    const cells = document.querySelectorAll('.cell');
+    cells.forEach(cell => {
+        cell.style.width = `${cellSize}px`;
+        cell.style.height = `${cellSize}px`;
+        // Remove any margin or padding that might cause inconsistency
+        cell.style.margin = "0";
+        cell.style.boxSizing = "border-box";
+    });
+}
     
     // For mobile, ensure proper scrolling
     if (window.innerWidth < 600) {
