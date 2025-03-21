@@ -136,6 +136,18 @@ button:disabled {
     border-radius: 2px;
 }
 
+.watching-tv {
+    opacity: 0.5;
+}
+
+.tv-status.on {
+    background-color: red;
+    color: white;
+    font-weight: bold;
+}
+
+
+
 .notification {
     position: fixed;
     top: 20px;
