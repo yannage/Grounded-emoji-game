@@ -74,7 +74,7 @@ function renderGrid() {
                     contentContainer.appendChild(playerElement);
                 }
                 
-                // Add TV status
+                // Add TV status at bottom of cell
                 const tvStatus = document.createElement("div");
                 tvStatus.className = "tv-status";
                 
