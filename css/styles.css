@@ -200,3 +200,104 @@ button:not(:disabled):active {
     50% { border-color: rgba(76, 175, 80, 1); }
     100% { border-color: rgba(76, 175, 80, 0.4); }
 }
+
+.game-wrapper {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.tagline {
+    color: #555;
+    margin-top: -15px;
+    font-size: 1.1rem;
+}
+
+.tv-emoji {
+    animation: bounce 1s infinite alternate;
+    display: inline-block;
+}
+
+@keyframes bounce {
+    from { transform: translateY(0); }
+    to { transform: translateY(-5px); }
+}
+
+footer {
+    text-align: center;
+    margin-top: 30px;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.text-button {
+    background: none;
+    border: none;
+    color: #4CAF50;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+.text-button:hover {
+    color: #2E7D32;
+}
+
+.info-label {
+    font-weight: bold;
+    color: #ccc;
+}
+
+.stat-label {
+    font-weight: bold;
+    display: inline-block;
+    width: 150px;
+}
+
+.stat-value {
+    font-size: 1.1rem;
+    color: #4CAF50;
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.help-content {
+    text-align: left;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.help-content h3 {
+    color: #4CAF50;
+    margin-top: 15px;
+}
+
+.help-content ul {
+    padding-left: 20px;
+}
