@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Grounded: TV Time</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <div id="game">
+    <div id="house">
+      <div class="room" id="bedroom">🛏️ Bedroom <div class="tv" data-room="bedroom">📺</div></div>
+      <div class="room" id="livingroom">🛋️ Living Room <div class="tv" data-room="livingroom">📺</div></div>
+      <div class="room" id="bathroom">🚽 Bathroom</div>
+      <div class="room" id="parentsroom">🛏️ Parents’ Room <div class="tv" data-room="parentsroom">📺</div></div>
+      <div class="room" id="basement">🪜 Basement <div class="tv" data-room="basement">📺</div></div>
+    </div>
+
+    <div id="characters">
+      <div id="kid">🧒</div>
+      <div id="parent">👨‍🦰</div>
+    </div>
+
+    <div id="ui">
+      <div id="clock">Time: 12:30</div>
+      <div id="showAlert"></div>
+      <div id="controls">
+        <button onclick="hide()">Hide</button>
+        <button onclick="lockDoor()">Lock Door</button>
+      </div>
+    </div>
+
+    <div id="statsScreen" class="hidden">
+      <h2>Day Over!</h2>
+      <div id="statsContent"></div>
+      <button onclick="startNewDay()">Start New Day</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
