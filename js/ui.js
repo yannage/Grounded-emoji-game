@@ -31,19 +31,21 @@ function renderGrid() {
             }
             
             // Add TV status
-            if (gameState.tvLocations.some(tv => tv.x === x && tv.y === y)) {
-                const tvStatus = document.createElement("div");
-                tvStatus.className = "tv-status";
-                
-                if (gameState.watchingTV && gameState.playerPosition.x === x && gameState.playerPosition.y === y) {
-                    tvStatus.textContent = "ON";
-                    cell.style.color = "red";  // TV is on
-                } else {
-                    tvStatus.textContent = "OFF";
-                }
-                
-                cell.appendChild(tvStatus);
-            }
+  
+if (gameState.tvLocations.some(tv => tv.x === x && tv.y === y)) {
+    const tvStatus = document.createElement("div");
+    tvStatus.className = "tv-status";
+    
+    if (gameState.watchingTV && gameState.playerPosition.x === x && gameState.playerPosition.y === y) {
+        tvStatus.textContent = "ON";
+        tvStatus.classList.add("on");
+        cell.style.color = "red";  // TV is on
+    } else {
+        tvStatus.textContent = "OFF";
+    }
+    
+    cell.appendChild(tvStatus);
+}
             
             // Add characters
             if (gameState.playerPosition.x === x && gameState.playerPosition.y === y) {
