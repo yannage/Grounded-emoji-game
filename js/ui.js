@@ -243,44 +243,19 @@ function fixGridSizing() {
     }
 }
 
-// Fix grid
+// Fix grid sizing issues
 function fixGridSizing() {
     const gridElement = document.getElementById("house-grid");
-    const gridWidth = gridElement.offsetWidth;
-    const cellSize = Math.floor(gridWidth / 15); // 15 columns
+    if (!gridElement) return; // Safety check
     
     const cells = document.querySelectorAll('.cell');
-    cells.forEach(cell => {
-        cell.style.width = `${cellSize}px`;
-        cell.style.height = `${cellSize}px`;
-        // Remove any margin or padding that might cause inconsistency
-        cell.style.margin = "0";
-        cell.style.boxSizing = "border-box";
-    });
-}
+    if (cells.length === 0) return; // Safety check
     
-    // For mobile, ensure proper scrolling
-    if (window.innerWidth < 600) {
-        // Make sure grid has minimum width to be usable
-        gridElement.style.minWidth = "380px";
-        
-        const cells = document.querySelectorAll('.cell');
-        const cellSize = Math.floor(gridElement.offsetWidth / 15); // 15 columns
-        
-        cells.forEach(cell => {
-            cell.style.width = `${cellSize}px`;
-            cell.style.height = `${cellSize}px`;
-            // Scale font size based on cell size
-            cell.style.fontSize = `${Math.max(cellSize * 0.5, 10)}px`;
-        });
-    } else {
-        // For desktop
-        const cells = document.querySelectorAll('.cell');
-        const cellSize = Math.floor(gridElement.offsetWidth / 15);
-        
-        cells.forEach(cell => {
-            cell.style.width = `${cellSize}px`;
-            cell.style.height = `${cellSize}px`;
-        });
-    }
+    // Set a consistent cell size based on available width
+    const cellWidth = Math.floor(gridElement.offsetWidth / 15);
+    
+    cells.forEach(cell => {
+        cell.style.width = cellWidth + 'px';
+        cell.style.height = cellWidth + 'px';
+    });
 }
