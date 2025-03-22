@@ -18,30 +18,37 @@ body {
     box-sizing: border-box;
 }
 
-#house-grid-container {
-    width: 100%;
-    height: 300px; /* Set a fixed height */
-    overflow: auto;
-    margin: 15px 0;
-    border: 1px solid #333;
+/* Info panel styling */
+.info-panel {
     background-color: #333;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
 }
 
+.info-panel > div {
+    margin-bottom: 4px;
+}
+
+/* Grid container & grid */
 #house-grid {
     display: grid;
     grid-template-columns: repeat(15, 1fr);
     grid-template-rows: repeat(12, 1fr);
     gap: 1px;
+    background-color: #333;
+    padding: 5px;
+    border-radius: 5px;
     width: 100%;
-    height: 100%;
     min-height: 300px;
+    box-sizing: border-box;
 }
 
-
+/* Cell styling */
 .cell {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 1/1;
     background-color: #fff;
     display: flex;
     justify-content: center;
@@ -49,7 +56,8 @@ body {
     font-size: 14px;
     user-select: none;
     position: relative;
-    overflow: hidden;
+    min-height: 25px;
+    aspect-ratio: 1/1;
 }
 
 .wall {
@@ -90,7 +98,6 @@ body {
 }
 
 .floor.reachable {
-    border: none;
     position: relative;
 }
 
@@ -102,17 +109,8 @@ body {
     right: 0;
     bottom: 0;
     background-color: rgba(0, 255, 0, 0.2);
-    border-radius: 4px;
     pointer-events: none;
     z-index: 1;
-}
-
-
-.cell {
-    border: none;
-    margin: 0;
-    box-shadow: none;
-}
 }
 
 .door {
@@ -124,20 +122,7 @@ body {
     background-color: #8b4513;
 }
 
-.info-panel {
-    background-color: #333;
-    color: white;
-    padding: 10px;
-    border-radius: 5px;
-    display: flex;
-    flex-direction: column;
-    font-size: 14px;
-}
-
-.info-panel > div {
-    margin-bottom: 4px;
-}
-
+/* Controls styling */
 .controls {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -165,6 +150,7 @@ button:disabled {
     cursor: not-allowed;
 }
 
+/* TV status */
 .tv-status {
     position: absolute;
     bottom: 2px;
@@ -184,6 +170,7 @@ button:disabled {
     font-weight: bold;
 }
 
+/* Notifications */
 .notification {
     position: fixed;
     top: 20px;
@@ -199,6 +186,7 @@ button:disabled {
     text-align: center;
 }
 
+/* Game over modal */
 #game-over-modal {
     position: fixed;
     top: 0;
@@ -223,6 +211,7 @@ button:disabled {
     overflow-y: auto;
 }
 
+/* Upgrades */
 #upgrade-panel {
     display: grid;
     grid-template-columns: 1fr;
@@ -251,6 +240,7 @@ button:disabled {
     text-align: left;
 }
 
+/* Player watching TV */
 .watching-tv {
     opacity: 0.5;
 }
@@ -286,6 +276,7 @@ button:disabled {
     }
 }
 
+/* Page styling */
 h1 {
     margin: 10px 0;
     text-align: center;
@@ -315,7 +306,29 @@ footer {
     margin-left: 10px;
 }
 
-/* Mobile-specific adjustments */
+/* Help modal */
+#help-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+/* Mobile adjustments */
 @media screen and (max-width: 600px) {
     body {
         padding: 5px;
@@ -323,20 +336,6 @@ footer {
 
     h1 {
         font-size: 1.5rem;
-    }
-    
-    #house-grid {
-        padding: 1px;
-        gap: 0px;
-    }
-    
-    #house-grid-container::-webkit-scrollbar {
-        height: 4px;
-    }
-    
-    #house-grid-container::-webkit-scrollbar-thumb {
-        background-color: rgba(0,0,0,0.3);
-        border-radius: 4px;
     }
     
     .cell {
@@ -349,3 +348,14 @@ footer {
     }
 }
 
+/* Extra small screens */
+@media screen and (max-width: 350px) {
+    .cell {
+        font-size: 10px;
+    }
+    
+    .info-panel {
+        font-size: 12px;
+        padding: 8px;
+    }
+}
